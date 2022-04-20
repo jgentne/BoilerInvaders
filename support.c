@@ -189,62 +189,74 @@ void rocketMan(void)
             }
             gbCheck = gbCheckVal(gbY);
 
-            if(0)
+            if(bg1)
             {
                 moveBadGuys(&bgX1, &bgY1, alternate);
                 bg1 = bgCheck(bgX1, bgY1, gbX, gbY, &gbCheck);
                 if(!bg1){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
 
-            if(0)
+            if(bg2)
             {
                 moveBadGuys(&bgX2, &bgY2, alternate);
                 bg2 = bgCheck(bgX2, bgY2, gbX, gbY, &gbCheck);
                 if(!bg2){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
                     }
+                }
             }
 
-            if(0)
+            if(bg3)
             {
                 moveBadGuys(&bgX3, &bgY3, alternate);
                 bg3 = bgCheck(bgX3, bgY3, gbX, gbY, &gbCheck);
                 if(!bg3){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
 
-            if(0)
+            if(bg4)
             {
                 moveBadGuys(&bgX4, &bgY4, alternate);
                 bg4 = bgCheck(bgX4, bgY4, gbX, gbY, &gbCheck);
                 if(!bg4){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
-            if(0)
+            if(bg5)
             {
                 moveBadGuys(&bgX5, &bgY5, alternate);
                 bg5 = bgCheck(bgX5, bgY5, gbX, gbY, &gbCheck);
                 if(!bg5){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
 
-            if(0)
+            if(bg6)
             {
                 moveBadGuys(&bgX6, &bgY6, alternate);
                 bg6 = bgCheck(bgX6, bgY6, gbX, gbY, &gbCheck);
                 if(!bg6){
                     gbCheck = 0;
-                    removeBulletHit(gbX, gbY);
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
 
@@ -254,10 +266,9 @@ void rocketMan(void)
                 bg7 = bgCheck(bgX7, bgY7, gbX, gbY, &gbCheck);
                 if(!bg7){
                     gbCheck = 0;
-                    for(int i= 0; i<100; i++){
-                            update(gbX-2, gbY+2, 0);
-                            gbY++;
-                        }
+                    while(gbY<325){
+                        update(gbX-2, ++gbY, 0);
+                    }
                 }
             }
 
@@ -268,12 +279,6 @@ void rocketMan(void)
             mp = midi_init(midifile);
             }
         }
-    }
-}
-
-void removeBulletHit(int gbX, int gbY){
-    (while(gbY<325)){
-        update(gbX-2, ++gbY, 0);
     }
 }
 
@@ -605,3 +610,4 @@ void basic_drawing(void)
     LCD_DrawFillRectangle(10, 140, 120, 159, WHITE);
     LCD_DrawString(20,141, BLACK, WHITE, "Test string!", 16, 0); // opaque background
 }
+
