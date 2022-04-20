@@ -74,12 +74,21 @@ extern const Picture badGuy;
 // A 100x100 picture uses 20000 bytes.  You have 32768 bytes of SRAM.
 #define TempPicturePtr(name,width,height) Picture name[(width)*(height)/6+2] = { {width,height,2} }
 
-void erase(int x, int y)
+void erase(int x, int y, int value)
 {
+    if(value ==0){
     TempPicturePtr(tmp,29,29); // Create a temporary 29x29 image.
     pic_subset(tmp, &background, x-tmp->width/2, y-tmp->height/2); // Copy the background
     //pic_overlay(tmp, 5,5, &player, 0xffff); // Overlay the ball
     LCD_DrawPicture(x-tmp->width/2,y-tmp->height/2, tmp); // Draw
+    }
+    else if(value == 1){
+        TempPicturePtr(tmp,12,18); // Create a temporary 29x29 image.
+            pic_subset(tmp, &background, x-tmp->width/2, y-tmp->height/2); // Copy the background
+            //pic_overlay(tmp, 5,5, &player, 0xffff); // Overlay the ball
+            LCD_DrawPicture(x-tmp->width/2,y-tmp->height/2, tmp); // Draw
+    }
+
 }
 
 void update(int x, int y, int Value)
@@ -89,7 +98,6 @@ void update(int x, int y, int Value)
     }
     else if(Value == 1) {
         LCD_DrawPicture(x-goodBullet.width/2,y-goodBullet.height/2, &goodBullet);
-        nano_wait(1000);
     }
     else if(Value == 0) {
         LCD_DrawPicture(x-bulletShadow.width/2,(y)-bulletShadow.height/2, &bulletShadow);
@@ -118,31 +126,36 @@ void rocketMan(void)
 
     int right, left, shootah, gbX, gbY;
     int gbCheck = 0;
-    int bg1, bg2, bg3, bg4, bg5, bg6 = 1;
+    int bg1, bg2, bg3, bg4, bg5, bg6, bg7 = 1;
+
     int bgX1 = 90;
     int bgY1 = 280; //initializing bad guy 1
 
     int bgX2 = 150;
-    int bgY2 = 280; //initializing bad guy 1
+    int bgY2 = 280; //initializing bad guy 2
 
     int bgX3 = 210;
-    int bgY3 = 280; //initializing bad guy 1
+    int bgY3 = 280; //initializing bad guy 3
 
     int bgX4 = 60;
-    int bgY4 = 295; //initializing bad guy 1
+    int bgY4 = 295; //initializing bad guy 4
 
     int bgX5 = 120;
-    int bgY5 = 295; //initializing bad guy 1
+    int bgY5 = 295; //initializing bad guy 5
 
     int bgX6 = 180;
-    int bgY6 = 295; //initializing bad guy 1
+    int bgY6 = 295; //initializing bad guy 6
+
+    int bgX7 = 30;
+    int bgY7 = 280; //initializing bad guy 7
+
     int alternate = 1;
 
-    int MAX = 1000;
+    int MAX = 6400;
     for(;;) {
         for(int z=0; z<4; z++)
             {
-            nano_wait(2000000); // wait
+            nano_wait(100000); // wait
             right = GPIOC->IDR & 1<<6;
             left = GPIOC->IDR & 1<<7;
             shootah = GPIOC->IDR & 1<<8;
@@ -156,7 +169,7 @@ void rocketMan(void)
 
             if(gbCheck)
             {
-                update(gbX-2, gbY + 20, 1);
+                update(gbX-2, gbY + 15, 1);
                 update(gbX-2, gbY+2, 0);
                 gbY += 1;
             }
@@ -173,48 +186,51 @@ void rocketMan(void)
                 x--;
                 update(x, y, 2);
             }
+            gbCheck = gbCheckVal(gbY);
 
-            if(gbY > 310)
+//            bg1 = bgCheck(bgX1, bgY1, gbX, gbY);
+//            bg2 = bgCheck(bgX2, bgY2, gbX, gbY);
+//            bg3 = bgCheck(bgX3, bgY3, gbX, gbY);
+//            bg4 = bgCheck(bgX4, bgY4, gbX, gbY);
+//            bg5 = bgCheck(bgX5, bgY5, gbX, gbY);
+//            bg6 = bgCheck(bgX6, bgY6, gbX, gbY);
+//            bg7 = bgCheck(bgX7, bgY7, gbX, gbY);
+
+            if(bg1)
             {
-                gbCheck = 0;
+                moveBadGuys(&bgX1, &bgY1, alternate);
             }
 
-//            if(bg1)
-//            {
-//                update(bgX1, bgY1, 3);
-//            }
-//
-//            if(bg2)
-//            {
-//                update(bgX2, bgY2, 3);
-//            }
-//
-//            if(bg3)
-//            {
-//                update(bgX3, bgY3, 3);
-//            }
-//
-//            if(bg4)
-//            {
-//                update(bgX4, bgY4, 3);
-//            }
-//            if(1)
-//            {
-//                moveBadGuys(bgX5, bgY5, alternate, MAX);
-//
-//
-//            }
-//
-//            if(bg6)
-//            {
-//                update(bgX6, bgY6, 3);
-//            }
-//
-//            alternate++;
-//            if(alternate == MAX)
-//            {
-//                alternate = 0;
-//            }
+            if(bg2)
+            {
+                moveBadGuys(&bgX2, &bgY2, alternate);
+            }
+
+            if(bg3)
+            {
+                moveBadGuys(&bgX3, &bgY3, alternate);
+            }
+
+            if(bg4)
+            {
+                moveBadGuys(&bgX4, &bgY4, alternate);
+            }
+            if(bg5)
+            {
+                moveBadGuys(&bgX5, &bgY5, alternate);
+            }
+
+            if(bg6)
+            {
+                moveBadGuys(&bgX6, &bgY6, alternate);
+            }
+
+            if(bg7)
+            {
+                moveBadGuys(&bgX7, &bgY7, alternate);
+            }
+
+            alternate = altInc(alternate);
 
             asm("wfi");
             if (mp->nexttick == MAXTICKS) {
@@ -224,44 +240,227 @@ void rocketMan(void)
     }
 }
 
-//void moveBadGuys(int x, int y, int alternate, int MAX){
-//    int num = 4;
-//
-//    if(alternate == MAX / 8 || alternate == MAX / 8 + MAX/2)
-//    {
-//        for(int i= 0; i < num; i++)
-//        {
-//            x += 2;
-//            update(x, y, 3);
-//        }
-//    }
-//    else if(alternate == 2 * MAX / 8 || alternate == 2 * MAX / 8 + MAX/2)
-//    {
-//        for(int i= 0; i < num; i++)
-//        {
-//            y += 2;
-//            update(x, y, 3);
-//        }
-//    }
-//    else if(alternate == 3 * MAX / 8 || alternate == 3 * MAX / 8 + MAX/2)
-//                    {
-//                    x -= 2;
-//                    update(bgX5, bgY5, 3);
-//                    x -= 2;
-//                    update(bgX5, bgY5, 3);
-//                    }
-//                    else if(alternate == MAX / 2 || alternate == 0)
-//                    {
-//                    y -= 2;
-//                    update(bgX5, bgY5, 3);
-//                    y -= 2;
-//                    update(bgX5, bgY5, 3);
-//    //                bgY5 -= 2;
-//    //                update(bgX5, bgY5, 3);
-//    //                bgY5 -= 2;
-//    //                update(bgX5, bgY5, 3);
-//                    }
-//}
+//int bgCheck()
+
+int altInc(int inc) {
+    inc++;
+    if(inc == 6400)
+    {
+       inc = 0;
+    }
+    return inc;
+}
+
+int gbCheckVal(int val) {
+    if(val > 325)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+void moveBadGuys(int *x, int *y, int alternate, int MAX)
+{
+//    nano_wait(1000);
+//    erase(*x,*y,1);
+
+    switch(alternate)
+    {
+    case 100:
+        *y += 2;
+        break;
+    case 200:
+        *x += 2;
+        break;
+    case 300:
+        *y -= 2;
+      break;
+    case 400:
+        *x += 2;
+        break;
+    case 500:
+        *y += 2;
+        break;
+    case 600:
+        *x += 2;
+        break;
+    case 700:
+        *y -= 2;
+        break;
+    case 800:
+        *x += 2;
+        break;
+    case (900):
+        *y += 2;
+        break;
+    case 1000:
+        *x += 2;
+        break;
+    case 1100:
+        *y -= 2;
+      break;
+    case 1200:
+        *x += 2;
+      break;
+    case 1300:
+        *y += 2;
+      break;
+    case 1400:
+        *x += 2;
+      break;
+    case 1500:
+        *y -= 2;
+      break;
+    case 1600:
+        *x += 2;
+      break;
+    case 1700:
+        *y += 2;
+      break;
+    case 1800:
+        *x -= 2;
+        break;
+    case 1900:
+        *y -= 2;
+      break;
+    case 2000:
+        *x -= 2;
+        break;
+    case 2100:
+        *y += 2;
+      break;
+    case 2200:
+        *x -= 2;
+      break;
+    case 2300:
+        *y -= 2;
+      break;
+    case 2400:
+        *x -= 2;
+        break;
+    case 2500:
+        *y += 2;
+      break;
+    case 2600:
+        *x -= 2;
+      break;
+    case 2700:
+        *y -= 2;
+      break;
+    case 2800:
+        *x -= 2;
+      break;
+    case 2900:
+        *y += 2;
+      break;
+    case 3000:
+        *x -= 2;
+      break;
+    case 3100:
+        *y -= 2;
+      break;
+    case 3200:
+        *x -= 2;
+      break;
+    case 3300:
+        *y += 2;
+      break;
+    case 3400:
+        *x -= 2;
+        break;
+    case 3500:
+        *y -= 2;
+      break;
+    case 3600:
+        *x -= 2;
+        break;
+    case 3700:
+        *y += 2;
+      break;
+    case 3800:
+        *x -= 2;
+      break;
+    case 3900:
+        *y -= 2;
+      break;
+    case 4000:
+        *x -= 2;
+        break;
+    case 4100:
+        *y += 2;
+      break;
+    case 4200:
+        *x -= 2;
+      break;
+    case 4300:
+        *y -= 2;
+      break;
+    case 4400:
+        *x -= 2;
+      break;
+    case 4500:
+        *y += 2;
+      break;
+    case 4600:
+        *x -= 2;
+      break;
+    case 4700:
+        *y -= 2;
+      break;
+    case 4800:
+        *x -= 2;
+      break;
+    case 4900:
+        *y += 2;
+        break;
+    case 5000:
+        *x += 2;
+        break;
+    case 5100:
+        *y -= 2;
+      break;
+    case 5200:
+        *x += 2;
+        break;
+    case 5300:
+        *y += 2;
+        break;
+    case 5400:
+        *x += 2;
+        break;
+    case 5500:
+        *y -= 2;
+        break;
+    case 5600:
+        *x += 2;
+        break;
+    case 5700:
+        *y += 2;
+        break;
+    case 5800:
+        *x += 2;
+        break;
+    case 5900:
+        *y -= 2;
+      break;
+    case 6000:
+        *x += 2;
+      break;
+    case 6100:
+        *y += 2;
+      break;
+    case 6200:
+        *x += 2;
+      break;
+    case 6300:
+        *y -= 2;
+      break;
+    case 0:
+        *x += 2;
+        break;  }
+nano_wait(1000);
+update(*x,*y,3);
+}
 
 void generateGame(void) {
     LCD_DrawPicture(0,0,&background);
