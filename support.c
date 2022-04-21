@@ -5,6 +5,9 @@
 #include "midi.h"
 #include "midiplay.h"
 
+extern Voice voice[VOICES];
+extern int16_t* shoot;
+
 static void nano_wait(unsigned int n) {
     asm(    "        mov r0,%0\n"
             "repeat: sub r0,#83\n"
@@ -126,7 +129,13 @@ void rocketMan(void)
 
     int right, left, shootah, gbX, gbY;
     int gbCheck = 0;
-    int bg1, bg2, bg3, bg4, bg5, bg6, bg7 = 1;
+    int bg1Check = 1;
+    int bg2Check = 1;
+    int bg3Check = 1;
+    int bg4Check = 1;
+    int bg5Check = 1;
+    int bg6Check = 1;
+    int bg7Check = 1;
 
     int bgX1 = 90;
     int bgY1 = 280; //initializing bad guy 1
@@ -150,19 +159,25 @@ void rocketMan(void)
     int bgY7 = 280; //initializing bad guy 7
 
     int alternate = 1;
-    int justShot = 0;
 
     int MAX = 6400;
     for(;;) {
         for(int z=0; z<4; z++)
             {
-            nano_wait(2500000); // wait
+
+
+            nano_wait(2000000); // wait
             right = GPIOC->IDR & 1<<6;
             left = GPIOC->IDR & 1<<7;
             shootah = GPIOC->IDR & 1<<8;
 
             if((shootah && 1<<8) && (gbCheck != 1)) // initializing good bullet
             {
+                voice[VOICES].number = 1;
+                voice[VOICES].soundEffect = 1;
+                voice[VOICES].in_use = 1;
+                voice[VOICES].step = 1;
+                voice[VOICES].volume = 200;
                 gbCheck = 1;
                 gbX = x;
                 gbY = 30;
@@ -189,11 +204,11 @@ void rocketMan(void)
             }
             gbCheck = gbCheckVal(gbY);
 
-            if(bg1)
+            if(bg1Check)
             {
                 moveBadGuys(&bgX1, &bgY1, alternate);
-                bg1 = bgCheck(bgX1, bgY1, gbX, gbY, &gbCheck);
-                if(!bg1){
+                bg1Check = bgCheck(bgX1, bgY1, gbX, gbY, &gbCheck);
+                if(!bg1Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
@@ -201,11 +216,11 @@ void rocketMan(void)
                 }
             }
 
-            if(bg2)
+            if(bg2Check)
             {
                 moveBadGuys(&bgX2, &bgY2, alternate);
-                bg2 = bgCheck(bgX2, bgY2, gbX, gbY, &gbCheck);
-                if(!bg2){
+                bg2Check = bgCheck(bgX2, bgY2, gbX, gbY, &gbCheck);
+                if(!bg2Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
@@ -213,11 +228,11 @@ void rocketMan(void)
                 }
             }
 
-            if(bg3)
+            if(bg3Check)
             {
                 moveBadGuys(&bgX3, &bgY3, alternate);
-                bg3 = bgCheck(bgX3, bgY3, gbX, gbY, &gbCheck);
-                if(!bg3){
+                bg3Check = bgCheck(bgX3, bgY3, gbX, gbY, &gbCheck);
+                if(!bg3Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
@@ -225,22 +240,22 @@ void rocketMan(void)
                 }
             }
 
-            if(bg4)
+            if(bg4Check)
             {
                 moveBadGuys(&bgX4, &bgY4, alternate);
-                bg4 = bgCheck(bgX4, bgY4, gbX, gbY, &gbCheck);
-                if(!bg4){
+                bg4Check = bgCheck(bgX4, bgY4, gbX, gbY, &gbCheck);
+                if(!bg4Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
                     }
                 }
             }
-            if(bg5)
+            if(bg5Check)
             {
                 moveBadGuys(&bgX5, &bgY5, alternate);
-                bg5 = bgCheck(bgX5, bgY5, gbX, gbY, &gbCheck);
-                if(!bg5){
+                bg5Check = bgCheck(bgX5, bgY5, gbX, gbY, &gbCheck);
+                if(!bg5Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
@@ -248,11 +263,11 @@ void rocketMan(void)
                 }
             }
 
-            if(bg6)
+            if(bg6Check)
             {
                 moveBadGuys(&bgX6, &bgY6, alternate);
-                bg6 = bgCheck(bgX6, bgY6, gbX, gbY, &gbCheck);
-                if(!bg6){
+                bg6Check = bgCheck(bgX6, bgY6, gbX, gbY, &gbCheck);
+                if(!bg6Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
@@ -260,11 +275,11 @@ void rocketMan(void)
                 }
             }
 
-            if(bg7)
+            if(bg7Check)
             {
                 moveBadGuys(&bgX7, &bgY7, alternate);
-                bg7 = bgCheck(bgX7, bgY7, gbX, gbY, &gbCheck);
-                if(!bg7){
+                bg7Check = bgCheck(bgX7, bgY7, gbX, gbY, &gbCheck);
+                if(!bg7Check){
                     gbCheck = 0;
                     while(gbY<325){
                         update(gbX-2, ++gbY, 0);
