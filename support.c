@@ -638,17 +638,22 @@ void titleScreen(void){
     int right, left, shootah;
     right = GPIOC->IDR & 1<<6;
     left = GPIOC->IDR & 1<<7;
-    shootah = GPIOC->IDR & 1<<8;
-    //   LCD_DrawPicture(0,0,&blackBox);
+
+    //   LCD_DrawPicture(0,0,&background);
     int titlex = 120;
     int titley = -50;
 
     while(titley < 400){
-        if((shootah && 1<<8))
-            titley = 500;
         update(titlex,titley,6);
+        nano_wait(4000000000);
         titley++;
+        if(shootah == 1<<8){
+            return;
+        }
+        shootah = GPIOC->IDR & 1<<8;
     }
+
+
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 }
 
