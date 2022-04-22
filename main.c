@@ -283,7 +283,7 @@ int main(void)
     init_wavetable_hybrid2(); // set up the wavetable
     init_dac();         // initialize the DAC
     init_tim6();        // initialize TIM6
-
+    loseScreen();
     titleScreen();
     generateGame();
     rocketMan();

@@ -72,6 +72,9 @@ extern const Picture badGuy;
 extern const Picture shield;
 extern const Picture badBullet;
 extern const Picture titlecrawl;
+extern const Picture youwin;
+extern const Picture gameover;
+
 
 
 // This C macro will create an array of Picture elements.
@@ -121,6 +124,14 @@ void update(int x, int y, int Value)
     }
     else if(Value == 6){
         LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &titlecrawl);
+
+    }
+    else if(Value == 7){
+        LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &youwin);
+
+    }
+    else if(Value == 8){
+        LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &gameover);
 
     }
 }
@@ -557,7 +568,7 @@ int gbCheckVal(int val) {
 
 
 void generateGame(void) {
-    LCD_DrawPicture(0,0,&background);
+    LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 
     update(120,22,2); //initializing spaceship
 
@@ -573,7 +584,12 @@ void generateGame(void) {
 
 
 void titleScreen(void){
-    LCD_DrawPicture(0,0,&background);
+    LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
+    int right, left, shootah;
+    right = GPIOC->IDR & 1<<6;
+    left = GPIOC->IDR & 1<<7;
+    shootah = GPIOC->IDR & 1<<8;
+    //   LCD_DrawPicture(0,0,&background);
     int titlex = 120;
     int titley = -50;
 
@@ -581,12 +597,28 @@ void titleScreen(void){
         update(titlex,titley,6);
         nano_wait(4000000000);
         titley++;
+        if(shootah && 1<<8){
+            break;
+        }
     }
 //    while(true){
 //
 //    }
 
-    LCD_DrawPicture(0,0,&background);
+    LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
+}
+
+void winScreen(void){
+    LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
+    update(120,160,7);
+
+
+}
+
+void loseScreen(void){
+    LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
+    update(120,160,8);
+
 
 }
 
