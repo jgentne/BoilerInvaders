@@ -69,7 +69,6 @@ void pic_overlay(Picture *dst, int xoffset, int yoffset, const Picture *src, int
     }
 }
 
-extern const Picture background; // A 240x320 background image
 extern const Picture player;
 extern const Picture goodBullet;
 extern const Picture bulletShadow;
@@ -95,13 +94,13 @@ void erase(int x, int y, int value)
 {
     if(value ==0){
     TempPicturePtr(tmp,29,29); // Create a temporary 29x29 image.
-    pic_subset(tmp, &background, x-tmp->width/2, y-tmp->height/2); // Copy the background
+    pic_subset(tmp, &blackBox, x-tmp->width/2, y-tmp->height/2); // Copy the background
     //pic_overlay(tmp, 5,5, &player, 0xffff); // Overlay the ball
     LCD_DrawPicture(x-tmp->width/2,y-tmp->height/2, tmp); // Draw
     }
     else if(value == 1){
         TempPicturePtr(tmp,12,18); // Create a temporary 29x29 image.
-            pic_subset(tmp, &background, x-tmp->width/2, y-tmp->height/2); // Copy the background
+            pic_subset(tmp, &blackBox, x-tmp->width/2, y-tmp->height/2); // Copy the background
             //pic_overlay(tmp, 5,5, &player, 0xffff); // Overlay the ball
             LCD_DrawPicture(x-tmp->width/2,y-tmp->height/2, tmp); // Draw
     }
@@ -148,7 +147,7 @@ void update(int x, int y, int Value)
 void update2(int x, int y)
 {
     TempPicturePtr(tmp,29,29); // Create a temporary 29x29 image.
-    pic_subset(tmp, &background, x-tmp->width/2, y-tmp->height/2); // Copy the background
+    pic_subset(tmp, &blackBox, x-tmp->width/2, y-tmp->height/2); // Copy the background
     pic_overlay(tmp, 5,5, &player, 0xffff); // Overlay the ball
     LCD_DrawPicture(x-tmp->width/2,y-tmp->height/2, tmp); // Draw
 }
@@ -640,20 +639,16 @@ void titleScreen(void){
     right = GPIOC->IDR & 1<<6;
     left = GPIOC->IDR & 1<<7;
     shootah = GPIOC->IDR & 1<<8;
-    //   LCD_DrawPicture(0,0,&background);
+    //   LCD_DrawPicture(0,0,&blackBox);
     int titlex = 120;
     int titley = -50;
 
     while(titley < 400){
+        if((shootah && 1<<8))
+            titley = 500;
         update(titlex,titley,6);
-        nano_wait(4000000000);
         titley++;
-        if(shootah && 1<<8){
-            break;
-        }
     }
-
-
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 }
 
