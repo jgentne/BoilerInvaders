@@ -103,14 +103,14 @@ void TIM6_DAC_IRQHandler(void)
         }
     }
     int sound_sample = 0;
-//      for(int n=0; n<3; n++) { //commenting out some of the audio stuff so the remainder compiles
-//           if (isSoundeffect[n] != 0) {
-//               soundeffects[n].offset += soundeffects[n].note;
-//              if (soundeffects[n].offset >= N<<16)
-//                  soundeffects[n].offset -= N<<16;
-//              sound_sample += (wavetable[soundeffects[n].offset>>16] * soundeffects[n].volume) >> 4;
-//            }
-//      }
+     for(int n=0; n<3; n++) { //commenting out some of the audio stuff so the remainder compiles
+          if (isSoundeffect[n] != 0) {
+               soundeffects[n].offset += soundeffects[n].note;
+              if (soundeffects[n].offset >= N<<16)
+                  soundeffects[n].offset -= N<<16;
+              sound_sample += (wavetable[soundeffects[n].offset>>16] * soundeffects[n].volume) >> 4;
+            }
+      }
       sample += sound_sample;
 
     sample = (sample >> 10) + 2048;
@@ -299,6 +299,8 @@ struct {
 
 void rocketMan(void);
 
+
+
 int main(void)
 {
     LCD_Setup(); // this will call init_lcd_spi()
@@ -309,6 +311,7 @@ int main(void)
     init_dac();         // initialize the DAC
     init_tim6();        // initialize TIM6
     titleScreen();
+    midioff();
     generateGame();
     rocketMan();
 //    for(int i = 0; i < 50 ; i++){

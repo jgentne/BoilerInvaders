@@ -7,6 +7,20 @@
 #include "midi.h"
 #include "midiplay.h"
 
+#define VOICES 15
+#define sfx 15
+//#define N 20
+//#define  RATE 40
+
+struct {
+    uint8_t in_use;
+    uint8_t note;
+    uint8_t chan;
+    uint8_t volume;
+    int     step;
+    int     offset;
+} voice[VOICES];
+
 int track1;
 int track2;
 int track3;
@@ -618,6 +632,7 @@ int gbCheckVal(int val) {
 
 
 void generateGame(void) {
+
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 
     update(120,22,2); //initializing spaceship
@@ -634,6 +649,8 @@ void generateGame(void) {
 
 
 void titleScreen(void){
+    MIDI_Player *mp = midi_init(SWmidifile);
+    init_tim2(10417);
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     int right, left, shootah;
     right = GPIOC->IDR & 1<<6;
@@ -648,25 +665,44 @@ void titleScreen(void){
         nano_wait(4000000000);
         titley++;
         if(shootah == 1<<8){
-            return;
+            break;
         }
         shootah = GPIOC->IDR & 1<<8;
     }
 
 
+    midioff();
+
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 }
 
 void winScreen(void){
+    midioff();
+    MIDI_Player *mp = midi_init(SWmidifile);
+    init_tim2(10417);
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     update(120,160,7);
-
-
 }
 
 void loseScreen(void){
+    midioff();
+    MIDI_Player *mp = midi_init(fighter);
+    init_tim2(10417);
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     update(120,160,8);
+}
+
+void midioff(void){
+    TIM2->CR1 &= ~TIM_CR1_CEN;
+    for(int x =0; x<VOICES; x++){
+        voice[x].in_use =0;
+        voice[x].step =0;
+        voice[x].offset =0;
+    }
+ //
+
+    TIM2->CR1 |= TIM_CR1_CEN;
+
 }
 
 void basic_drawing(void)
