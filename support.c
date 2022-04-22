@@ -6,7 +6,7 @@
 #include "midi.h"
 #include "midiplay.h"
 
-extern Voice voice[VOICES];
+//extern Voice voice[VOICES];
 extern int16_t* shoot;
 
 static void nano_wait(unsigned int n) {
@@ -71,6 +71,8 @@ extern const Picture bulletShadow;
 extern const Picture badGuy;
 extern const Picture shield;
 extern const Picture badBullet;
+extern const Picture titlecrawl;
+
 
 // This C macro will create an array of Picture elements.
 // Really, you'll just use it as a pointer to a single Picture
@@ -116,6 +118,9 @@ void update(int x, int y, int Value)
     }
     else if(Value == 5){
         LCD_DrawPicture(x-badBullet.width/2,(y)-badBullet.height/2, &badBullet);
+    }
+    else if(Value == 6){
+        LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &titlecrawl);
 
     }
 }
@@ -215,11 +220,11 @@ void rocketMan(void)
 
             if((shootah && 1<<8) && (gbCheck != 1) && !((x > shieldX - 20 + 10 * shieldDir) && (x < shieldX + 20 + 10 * shieldDir))) // initializing good bullet
             {
-                voice[VOICES].number = 1;
-                voice[VOICES].soundEffect = 1;
-                voice[VOICES].in_use = 1;
-                voice[VOICES].step = 1;
-                voice[VOICES].volume = 200;
+//                voice[VOICES].number = 1;
+//                voice[VOICES].soundEffect = 1;
+//                voice[VOICES].in_use = 1;
+//                voice[VOICES].step = 1;
+//                voice[VOICES].volume = 200;
                 gbCheck = 1;
                 gbX = x;
                 gbY = 30;
@@ -564,6 +569,25 @@ void generateGame(void) {
     update(180, 295, 3);
 
     update(120, 50, 4);
+}
+
+
+void titleScreen(void){
+    LCD_DrawPicture(0,0,&background);
+    int titlex = 120;
+    int titley = -50;
+
+    while(titley < 400){
+        update(titlex,titley,6);
+        nano_wait(4000000000);
+        titley++;
+    }
+//    while(true){
+//
+//    }
+
+    LCD_DrawPicture(0,0,&background);
+
 }
 
 void basic_drawing(void)
