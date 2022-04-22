@@ -1,17 +1,12 @@
 #include "stm32f0xx.h"
 #include "lcd.h"
-#include "stm32f0xx.h"
-#include "lcd.h"
-#include "sys.h"
-#include "video.h"
-#include "gdi.h"
-#include "space_invaders.h"
 #include <stdint.h>
 #include "midi.h"
 #include "midiplay.h"
 
 //random things i've defined -Rohith
 #define VOICES 15
+#define sfx 15
 //#define N 20
 //#define  RATE 40
 
@@ -24,24 +19,41 @@ struct {
     int     offset;
 } voice[VOICES];
 
+struct {
+    uint32_t note;
+    uint32_t volume;
+    uint32_t offset;
+} soundeffects[] = {
+        {261.63 * N / RATE * (1<<16),1,0}, {73.42 * N / RATE * (1<<16),1,0}, {440.00 * N / RATE * (1<<16),1,0}
+        // NAZRAN! I'm using sf[0] as shoot, sf[1] as invader killed, and sf[2] as explosion!
+        // I also changed the sf lengths for invader killed and expl to 50. When you get better sounds in these, this
+//        will probably need to be changed. ALSO, theres a tricky problem we have when the explosion sound is triggered.
+//        When the explosion sound is triggered, the game ends, and the for loop is broken out of and the game over thing
+//        is shown. However, because the counter variable for the sounds is alternate, there is no way to continue waiting nano_wait(2000000)
+//        amount of time 50 or whatever you change the length to times. I have a for loop at the end of main for this to wait after rocketman
+//        is broken out of, but nano_wait is being weird for some reason. Uncomment it and play around with it.
+//        Good luck dawg.
+
+
+};
 
 void init_lcd_spi(void)
 {
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	GPIOB->MODER &= ~(GPIO_MODER_MODER8 | GPIO_MODER_MODER11 | GPIO_MODER_MODER14 | GPIO_MODER_MODER3 | GPIO_MODER_MODER5);
-	GPIOB->MODER |=  (GPIO_MODER_MODER8_0 | GPIO_MODER_MODER11_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER3_1 | GPIO_MODER_MODER5_1);
-	GPIOB->BSRR = (1<<8 | 1<<11 | 1<<14);
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    GPIOB->MODER &= ~(GPIO_MODER_MODER8 | GPIO_MODER_MODER11 | GPIO_MODER_MODER14 | GPIO_MODER_MODER3 | GPIO_MODER_MODER5);
+    GPIOB->MODER |=  (GPIO_MODER_MODER8_0 | GPIO_MODER_MODER11_0 | GPIO_MODER_MODER14_0 | GPIO_MODER_MODER3_1 | GPIO_MODER_MODER5_1);
+    GPIOB->BSRR = (1<<8 | 1<<11 | 1<<14);
 
-	GPIOB->AFR[0] &= ~0xf < (4 * 3);
-	GPIOB->AFR[0] &= ~0xf < (4 * 5);
+    GPIOB->AFR[0] &= ~0xf < (4 * 3);
+    GPIOB->AFR[0] &= ~0xf < (4 * 5);
 
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-	SPI1->CR1 &= ~SPI_CR1_SPE;
-	SPI1->CR1 &= ~SPI_CR1_BR;
-	SPI1->CR1 |= SPI_CR1_MSTR;
-	SPI1->CR1 |= SPI_CR1_SSI | SPI_CR1_SSM;
-	SPI1->CR1 |= SPI_CR1_SPE;
-	return;
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+    SPI1->CR1 &= ~SPI_CR1_SPE;
+    SPI1->CR1 &= ~SPI_CR1_BR;
+    SPI1->CR1 |= SPI_CR1_MSTR;
+    SPI1->CR1 |= SPI_CR1_SSI | SPI_CR1_SSM;
+    SPI1->CR1 |= SPI_CR1_SPE;
+    return;
 }
 
 void enable_ports(void)
@@ -75,6 +87,8 @@ void init_tim6(void)
 }
 
 
+
+
 void TIM6_DAC_IRQHandler(void)
 {
     // TODO: Remember to acknowledge the interrupt right here.
@@ -88,6 +102,17 @@ void TIM6_DAC_IRQHandler(void)
             sample += (wavetable[voice[x].offset>>16] * voice[x].volume) >> 4;
         }
     }
+    int sound_sample = 0;
+      for(int n=0; n<3; n++) {
+           if (isSoundeffect[n] != 0) {
+               soundeffects[n].offset += soundeffects[n].note;
+              if (soundeffects[n].offset >= N<<16)
+                  soundeffects[n].offset -= N<<16;
+              sound_sample += (wavetable[soundeffects[n].offset>>16] * soundeffects[n].volume) >> 4;
+            }
+      }
+      sample += sound_sample;
+
     sample = (sample >> 10) + 2048;
     if (sample > 4095)
         sample = 4095;
@@ -127,8 +152,8 @@ void TIM2_IRQHandler(void)
 //        note_on(0,0,events[n].note, events[n].volume);
 //        n++;
 //    }
-////    for(int x=0; x < 10000; x++)
-////            ;
+//    for(int x=0; x < 10000; x++)
+//            ;
 //    // Increment the time by one tick.
 //    time += 1;
 //
@@ -283,10 +308,13 @@ int main(void)
     init_wavetable_hybrid2(); // set up the wavetable
     init_dac();         // initialize the DAC
     init_tim6();        // initialize TIM6
-    loseScreen();
-    titleScreen();
+
     generateGame();
     rocketMan();
+//    for(int i = 0; i < 50 ; i++){
+//        nano_wait(2000000);
+//    }
+    isSoundeffect[2] = 0;
 
     return 0;
 

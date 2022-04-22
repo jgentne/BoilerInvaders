@@ -1,3 +1,4 @@
+
 #include "stm32f0xx.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -5,6 +6,10 @@
 #include "lcd.h"
 #include "midi.h"
 #include "midiplay.h"
+
+int track1;
+int track2;
+int track3;
 
 //extern Voice voice[VOICES];
 extern int16_t* shoot;
@@ -74,6 +79,7 @@ extern const Picture badBullet;
 extern const Picture titlecrawl;
 extern const Picture youwin;
 extern const Picture gameover;
+extern const Picture blackBox;
 
 
 
@@ -127,12 +133,15 @@ void update(int x, int y, int Value)
 
     }
     else if(Value == 7){
-        LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &youwin);
+        LCD_DrawPicture(x-youwin.width/2,(y)-youwin.height/2, &youwin);
 
     }
     else if(Value == 8){
-        LCD_DrawPicture(x-titlecrawl.width/2,(y)-titlecrawl.height/2, &gameover);
+        LCD_DrawPicture(x-gameover.width/2,(y)-gameover.height/2, &gameover);
 
+    }
+    else if(Value == 9){
+        LCD_DrawPicture(x-blackBox.width/2,(y)-blackBox.height/2, &blackBox);
     }
 }
 
@@ -195,35 +204,31 @@ void rocketMan(void)
     int shieldY = 50;
     int shieldDir = 1;
 
-    int bgX1 = 90;
+    int bgX1 = 75;
     int bgY1 = 280; //initializing bad guy 1
 
-    int bgX2 = 150;
+    int bgX2 = 135;
     int bgY2 = 280; //initializing bad guy 2
 
-    int bgX3 = 210;
+    int bgX3 = 195;
     int bgY3 = 280; //initializing bad guy 3
 
-    int bgX4 = 60;
+    int bgX4 = 45;
     int bgY4 = 295; //initializing bad guy 4
 
-    int bgX5 = 120;
+    int bgX5 = 105;
     int bgY5 = 295; //initializing bad guy 5
 
-    int bgX6 = 180;
+    int bgX6 = 165;
     int bgY6 = 295; //initializing bad guy 6
 
-    int bgX7 = 30;
-    int bgY7 = 280; //initializing bad guy 7
+//    int bgX7 = 30;
+//    int bgY7 = 280; //initializing bad guy 7
 
     int alternate = 1;
 
-    int MAX = 6400;
     for(;;)
     {
-        for(int z=0; z<4; z++)
-        {
-
             nano_wait(2000000); // wait
             right = GPIOC->IDR & 1<<6;
             left = GPIOC->IDR & 1<<7;
@@ -239,6 +244,21 @@ void rocketMan(void)
                 gbCheck = 1;
                 gbX = x;
                 gbY = 30;
+
+                isSoundeffect[0] = 1;
+                track1 = (alternate + 25) % 6400;
+            }
+            if(track1 == alternate){
+            track1 = -1;
+            isSoundeffect[0] = 0;
+            }
+            if(track2 == alternate){
+            track2 = -1;
+            isSoundeffect[1] = 0;
+            }
+            if(track2 == alternate){
+            track3 = -1;
+            isSoundeffect[2] = 0;
             }
 
             if(gbCheck) //moving good bullet along
@@ -277,16 +297,10 @@ void rocketMan(void)
 
 
             //BAD GUY SHOOTING STUFF
-            if(alternate % 100 == 0)
+            if(alternate % 50 == 0)
             {
-              randNum = rand() % 7;
-//            bgBullet1 = bgBulletCheckAndGen(bgBullet1);
-//            bgBullet2 = bgBulletCheckAndGen(bgBullet2);
-//            bgBullet3 = bgBulletCheckAndGen(bgBullet3);
-//            bgBullet4 = bgBulletCheckAndGen(bgBullet4);
-//            bgBullet5 = bgBulletCheckAndGen(bgBullet5);
-//            bgBullet6 = bgBulletCheckAndGen(bgBullet6);
-//            bgBullet7 = bgBulletCheckAndGen(bgBullet7);
+              randNum = rand() % 3;
+
 
             if(randNum == 0 && !bgBullet1)
             {
@@ -307,39 +321,41 @@ void rocketMan(void)
                 bgBX3 = bgX3;
                 bgBY3 = bgY3 - 10;
             }
-            if(randNum == 3 && !bgBullet4)
-            {
-                bgBullet4 = 1;
-                bgBX4 = bgX4;
-                bgBY4 = bgY4 - 10;
-            }
-            if(randNum == 4 && !bgBullet5)
-            {
-                bgBullet5 = 1;
-                bgBX5 = bgX5;
-                bgBY5 = bgY5 - 10;
-            }
-            if(randNum == 5 && !bgBullet6)
-            {
-                bgBullet6 = 1;
-                bgBX6 = bgX6;
-                bgBY6 = bgY6 - 10;
-            }
-            if(randNum == 6 && !bgBullet7)
-            {
-                bgBullet7 = 1;
-                bgBX7 = bgX7;
-                bgBY7 = bgY7 - 10;
-             }
+//            if(!bgBullet4)//randNum == 3 && !bgBullet4)
+//            {
+//                bgBullet4 = 1;
+//                bgBX4 = bgX4;
+//                bgBY4 = bgY4 - 10;
+//            }
+//            if(!bgBullet5)//randNum == 4 && !bgBullet5)
+//            {
+//                bgBullet5 = 1;
+//                bgBX5 = bgX5;
+//                bgBY5 = bgY5 - 10;
+//            }
+//            if(!bgBullet6)//randNum == 5 && !bgBullet6)
+//            {
+//                bgBullet6 = 1;
+//                bgBX6 = bgX6;
+//                bgBY6 = bgY6 - 10;
+//            }
+//            if(!bgBullet7)//randNum == 6 && !bgBullet7)
+//            {
+//                bgBullet7 = 1;
+//                bgBX7 = bgX7;
+//                bgBY7 = bgY7 - 10;
+//             }
 
             }
 
-            if(bgBullet1, bg1Check)
+            if(bgBullet1 && bg1Check)
             {
                 update(bgBX1, bgBY1, 5);
-                bgBY1 -=1;
-                bgBullet1 = bgBulletCheck(bgBX1, bgBY1, x, y, shieldX, shieldY);
+                bgBY1 -=2;
+                bgBullet1 = bgBulletCheck(bgBX1, bgBY1, x, y, shieldX, shieldY, bg1Check);
                 if(bgBullet1 == -1){
+                    isSoundeffect[2] = 1;
+                    loseScreen();
                     break;
                 }
             }
@@ -347,9 +363,11 @@ void rocketMan(void)
             if(bgBullet2 && bg2Check)
             {
                 update(bgBX2, bgBY2, 5);
-                bgBY2 -=1;
-                bgBullet2 = bgBulletCheck(bgBX2, bgBY2, x, y, shieldX, shieldY);
+                bgBY2 -=2;
+                bgBullet2 = bgBulletCheck(bgBX2, bgBY2, x, y, shieldX, shieldY, bg2Check);
                 if(bgBullet2 == -1){
+                    isSoundeffect[2] = 1;
+                    loseScreen();
                     break;
                 }
             }
@@ -357,50 +375,56 @@ void rocketMan(void)
             if(bgBullet3 && bg3Check)
             {
                 update(bgBX3, bgBY3, 5);
-                bgBY3 -=1;
-                bgBullet3 = bgBulletCheck(bgBX3, bgBY3, x, y, shieldX, shieldY);
+                bgBY3 -=2;
+                bgBullet3 = bgBulletCheck(bgBX3, bgBY3, x, y, shieldX, shieldY, bg3Check);
                 if(bgBullet3 == -1){
+                    isSoundeffect[2] = 1;
+                    loseScreen();
                     break;
                 }
             }
-            if(bgBullet4 && bg4Check)
-            {
-                update(bgBX4, bgBY4, 5);
-                bgBY4 -=1;
-                bgBullet4 = bgBulletCheck(bgBX4, bgBY4, x, y, shieldX, shieldY);
-                if(bgBullet4 == -1){
-                    break;
-                }
-            }
-            if(bgBullet5 && bg5Check)
-            {
-                update(bgBX5, bgBY5, 5);
-                bgBY5 -=1;
-                bgBullet5 = bgBulletCheck(bgBX5, bgBY5, x, y, shieldX, shieldY);
-                if(bgBullet5 == -1){
-                    break;
-                }
-            }
-            if(bgBullet6 && bg6Check)
-            {
-                update(bgBX6, bgBY6, 5);
-                bgBY6 -=1;
-                bgBullet6 = bgBulletCheck(bgBX6, bgBY6, x, y, shieldX, shieldY);
-                if(bgBullet6 == -1){
-                    break;
-                }
-            }
-            if(bgBullet7 && bg7Check)
-            {
-                update(bgBX7, bgBY7, 5);
-                bgBY7 -=1;
-                bgBullet7 = bgBulletCheck(bgBX7, bgBY7, x, y, shieldX, shieldY);
-
-                if(bgBullet7 == -1)
-                {
-                    break;
-                }
-            }
+//            if(1)//bgBullet4 && bg4Check)
+//            {
+//                update(bgBX4, bgBY4, 5);
+//                bgBY4 -=1;
+//                bgBullet4 = bgBulletCheck(bgBX4, bgBY4, x, y, shieldX, shieldY);
+////                if(bgBullet4 == -1){
+//                  isSoundeffect[2] = 1;
+////                    break;
+////                }
+//            }
+//            if(bgBullet5 && bg5Check)
+//            {
+//                update(bgBX5, bgBY5, 5);
+//                bgBY5 -=1;
+//                bgBullet5 = bgBulletCheck(bgBX5, bgBY5, x, y, shieldX, shieldY);
+////                if(bgBullet5 == -1){
+//                  isSoundeffect[2] = 1;
+////                    break;
+////                }
+//            }
+//            if(bgBullet6 && bg6Check)
+//            {
+//                update(bgBX6, bgBY6, 5);
+//                bgBY6 -=1;
+//                bgBullet6 = bgBulletCheck(bgBX6, bgBY6, x, y, shieldX, shieldY);
+////                if(bgBullet6 == -1){
+//                  isSoundeffect[2] = 1;
+////                    break;
+////                }
+//            }
+//            if(bgBullet7 && bg7Check)
+//            {
+//                update(bgBX7, bgBY7, 5);
+//                bgBY7 -=1;
+//                bgBullet7 = bgBulletCheck(bgBX7, bgBY7, x, y, shieldX, shieldY);
+//
+////                if(bgBullet7 == -1)
+////                {
+//                      isSoundeffect[2] = 1;
+////                    break;
+////                }
+//            }
 
 
 
@@ -409,11 +433,14 @@ void rocketMan(void)
                 moveBadGuys(&bgX1, &bgY1, alternate);
                 bg1Check = bgCheck(bgX1, bgY1, gbX, gbY, &gbCheck);
                 if(!bg1Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
                         update(gbX-2, ++gbY, 0);
                     }
+                    update(bgBX1, bgBY1, 9);
                 }
             }
 
@@ -422,11 +449,15 @@ void rocketMan(void)
                 moveBadGuys(&bgX2, &bgY2, alternate);
                 bg2Check = bgCheck(bgX2, bgY2, gbX, gbY, &gbCheck);
                 if(!bg2Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
                         update(gbX-2, ++gbY, 0);
                     }
+                    update(bgBX2, bgBY2, 9);
+
                 }
             }
 
@@ -435,11 +466,15 @@ void rocketMan(void)
                 moveBadGuys(&bgX3, &bgY3, alternate);
                 bg3Check = bgCheck(bgX3, bgY3, gbX, gbY, &gbCheck);
                 if(!bg3Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
                         update(gbX-2, ++gbY, 0);
                     }
+                    update(bgBX3, bgBY3, 9);
+
                 }
             }
 
@@ -448,6 +483,8 @@ void rocketMan(void)
                 moveBadGuys(&bgX4, &bgY4, alternate);
                 bg4Check = bgCheck(bgX4, bgY4, gbX, gbY, &gbCheck);
                 if(!bg4Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
@@ -460,6 +497,8 @@ void rocketMan(void)
                 moveBadGuys(&bgX5, &bgY5, alternate);
                 bg5Check = bgCheck(bgX5, bgY5, gbX, gbY, &gbCheck);
                 if(!bg5Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
@@ -473,6 +512,8 @@ void rocketMan(void)
                 moveBadGuys(&bgX6, &bgY6, alternate);
                 bg6Check = bgCheck(bgX6, bgY6, gbX, gbY, &gbCheck);
                 if(!bg6Check){
+                    isSoundeffect[1] = 1;
+                    track2 = (alternate + 50) % 6400;
                     gbCheck = 0;
                     while(gbY<325)
                     {
@@ -480,19 +521,24 @@ void rocketMan(void)
                     }
                 }
             }
-
-            if(bg7Check)
-            {
-                moveBadGuys(&bgX7, &bgY7, alternate);
-                bg7Check = bgCheck(bgX7, bgY7, gbX, gbY, &gbCheck);
-                if(!bg7Check){
-                    gbCheck = 0;
-                    while(gbY<325)
-                    {
-                        update(gbX-2, ++gbY, 0);
-                    }
-                }
+            if(!(bg1Check + bg2Check +bg3Check +bg4Check +bg5Check +bg6Check)){
+                winScreen();
+                break;
             }
+            //            if(bg7Check)
+//            {
+//                moveBadGuys(&bgX7, &bgY7, alternate);
+//                bg7Check = bgCheck(bgX7, bgY7, gbX, gbY, &gbCheck);
+//                if(!bg7Check){
+//            isSoundeffect[1] = 1;
+//            track2 = (alternate + 50) % 6400;
+//                    gbCheck = 0;
+//                    while(gbY<325)
+//                    {
+//                        update(gbX-2, ++gbY, 0);
+//                    }
+//                }
+//            }
 
             alternate = altInc(alternate);
 
@@ -502,7 +548,6 @@ void rocketMan(void)
             mp = midi_init(midifile);
             }
         }
-    }
 }
 
 int bgCheck(int, int, int, int, int*);
@@ -514,32 +559,38 @@ int bgCheck(int bgX, int bgY, int gbX, int gbY, int* gbCheck) {
             erase(bgX, bgY, 1);
             *gbCheck = 0;
             return 0;
-        }
+            }
         }
 
 
     return 1;
 }
 
-int bgBulletCheck(int BX, int BY, int PX, int PY, int shieldX, int shieldY){
-    BX+=5;
-    if(BX < shieldX + 15 && BX > shieldX - 15 && BY > shieldY && BY < shieldY + 20){
+int bgBulletCheck(int BX, int BY, int PX, int PY, int shieldX, int shieldY, int badGuyCheck)
+{
+    if(BX < shieldX + 15 && BX > shieldX - 15 && BY > shieldY && BY < shieldY + 20)
+    {
 //    if(BX > PX - 10 || BX < PX + 10){
 //         //GAME OVER animation
 //        return -1;
 //    }
         nano_wait(1000);
-        BY += 20;
-        while(BY>50)
-        {
-            update(BX+2, --BY, 0);
-        }
+        update(BX, BY, 9);
         return 0;
-
         }
-    if(BY < -20){
+    else if(!badGuyCheck){
+        nano_wait(1000);
+        update(BX, BY, 9);
+    }
+    else if(BY < -20)
+    {
         return 0;
     }
+    else if(BX > PX - 10 && BX < PX + 10 && BY < 45 && BY > 30)
+    {
+        return -1;
+    }
+
 
     return 1;
 
@@ -572,14 +623,14 @@ void generateGame(void) {
 
     update(120,22,2); //initializing spaceship
 
-    update(90, 280, 3); //initializing bad guys
-    update(150, 280, 3);
-    update(210, 280, 3);
-    update(60, 295, 3); //initializing bad guys
-    update(120, 295, 3);
-    update(180, 295, 3);
+    update(75, 280, 3); //bg1
+    update(135, 280, 3); //bg2
+    update(195, 280, 3); //bg3
+    update(45, 295, 3); //bg4
+    update(105, 295, 3); //bg5
+    update(165, 295, 3); //bg6
 
-    update(120, 50, 4);
+    update(120, 50, 4); // shield
 }
 
 
@@ -601,9 +652,7 @@ void titleScreen(void){
             break;
         }
     }
-//    while(true){
-//
-//    }
+
 
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
 }
@@ -618,8 +667,6 @@ void winScreen(void){
 void loseScreen(void){
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     update(120,160,8);
-
-
 }
 
 void basic_drawing(void)
