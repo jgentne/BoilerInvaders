@@ -311,7 +311,6 @@ int main(void)
     init_dac();         // initialize the DAC
     init_tim6();        // initialize TIM6
     titleScreen();
-    midioff();
     generateGame();
     rocketMan();
 //    for(int i = 0; i < 50 ; i++){

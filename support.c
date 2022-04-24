@@ -169,7 +169,7 @@ void update2(int x, int y)
 void rocketMan(void)
 {
     // Draw the background.
-    MIDI_Player *mp = midi_init(midifile);
+    MIDI_Player *mp = midi_init(SWmidifile);
     init_tim2(10417);
 
     srand(250);
@@ -242,6 +242,7 @@ void rocketMan(void)
 
     for(;;)
     {
+
             nano_wait(2000000); // wait
             right = GPIOC->IDR & 1<<6;
             left = GPIOC->IDR & 1<<7;
@@ -368,6 +369,11 @@ void rocketMan(void)
                 bgBullet1 = bgBulletCheck(bgBX1, bgBY1, x, y, shieldX, shieldY, bg1Check);
                 if(bgBullet1 == -1){
                     isSoundeffect[2] = 1;
+                    asm("wfi");
+                    if (mp->nexttick == MAXTICKS)
+                    {
+                    mp = midi_init(SWmidifile);
+                    }
                     loseScreen();
                     break;
                 }
@@ -380,6 +386,11 @@ void rocketMan(void)
                 bgBullet2 = bgBulletCheck(bgBX2, bgBY2, x, y, shieldX, shieldY, bg2Check);
                 if(bgBullet2 == -1){
                     isSoundeffect[2] = 1;
+                    asm("wfi");
+                    if (mp->nexttick == MAXTICKS)
+                    {
+                    mp = midi_init(SWmidifile);
+                    }
                     loseScreen();
                     break;
                 }
@@ -392,6 +403,11 @@ void rocketMan(void)
                 bgBullet3 = bgBulletCheck(bgBX3, bgBY3, x, y, shieldX, shieldY, bg3Check);
                 if(bgBullet3 == -1){
                     isSoundeffect[2] = 1;
+                    asm("wfi");
+                    if (mp->nexttick == MAXTICKS)
+                    {
+                    mp = midi_init(SWmidifile);
+                    }
                     loseScreen();
                     break;
                 }
@@ -535,6 +551,11 @@ void rocketMan(void)
                 }
             }
             if(!(bg1Check + bg2Check +bg3Check +bg4Check +bg5Check +bg6Check)){
+                asm("wfi");
+                if (mp->nexttick == MAXTICKS)
+                {
+                mp = midi_init(SWmidifile);
+                }
                 winScreen();
                 break;
             }
@@ -555,12 +576,11 @@ void rocketMan(void)
 
             alternate = altInc(alternate);
 
-            asm("wfi");
-            if (mp->nexttick == MAXTICKS)
-            {
-            mp = midi_init(midifile);
-            }
+
+
         }
+
+
 }
 
 int bgCheck(int, int, int, int, int*);
@@ -669,8 +689,7 @@ void titleScreen(void){
         }
         shootah = GPIOC->IDR & 1<<8;
     }
-
-
+    mp = midi_init(SWmidifile);
     midioff();
 
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
@@ -678,7 +697,7 @@ void titleScreen(void){
 
 void winScreen(void){
     midioff();
-    MIDI_Player *mp = midi_init(SWmidifile);
+    MIDI_Player *mp = midi_init(Cantinamidifile);
     init_tim2(10417);
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     update(120,160,7);
@@ -686,7 +705,7 @@ void winScreen(void){
 
 void loseScreen(void){
     midioff();
-    MIDI_Player *mp = midi_init(fighter);
+    MIDI_Player *mp = midi_init(Cantinamidifile);
     init_tim2(10417);
     LCD_DrawFillRectangle(0, 0, 240, 320, BLACK);
     update(120,160,8);
